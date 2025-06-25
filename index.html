@@ -920,6 +920,77 @@
           opacity: 1;
         }
       }
+      /* Notification Popup Styles */
+      .notification-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 3000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .notification-popup.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .popup-content {
+        background-color: white;
+        border-radius: 10px;
+        padding: 30px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+      }
+
+      .notification-popup.show .popup-content {
+        transform: translateY(0);
+      }
+
+      .popup-icon {
+        font-size: 60px;
+        color: #4caf50;
+        margin-bottom: 20px;
+      }
+
+      .popup-title {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+      }
+
+      .popup-message {
+        color: #666;
+        margin-bottom: 25px;
+        line-height: 1.6;
+      }
+
+      /* Form validation styles */
+      .form-control.error {
+        border-color: #ff4444;
+      }
+
+      .error-message {
+        color: #ff4444;
+        font-size: 0.8rem;
+        margin-top: 5px;
+        display: none;
+      }
+
+      .form-control.error + .error-message {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -1020,7 +1091,7 @@
                 tuổi, giúp trẻ phát triển các kỹ năng vận động, ngôn ngữ và nhận
                 thức cơ bản.
               </p>
-              <a href="#" class="btn">Chi tiết</a>
+              <a href="nhatre.html" class="btn">Chi tiết</a>
             </div>
           </div>
           <div class="program-card animate">
@@ -1337,8 +1408,8 @@
                 <h4>Email</h4>
                 <p>
                   <a href="mailto:nguyenhaiphung1185@gmail.com"
-                    >nguyenhaiphung1185@gmail.com
-                  </a>
+                    >nguyenhaiphung1185@gmail.com</a
+                  >
                 </p>
               </div>
             </div>
@@ -1355,7 +1426,7 @@
           </div>
           <div class="contact-form animate">
             <h3>Đăng ký tham quan trường</h3>
-            <form>
+            <form id="registrationForm">
               <div class="form-group">
                 <label for="name">Họ và tên</label>
                 <input type="text" id="name" class="form-control" required />
@@ -1386,6 +1457,22 @@
               </button>
             </form>
           </div>
+        </div>
+      </div>
+
+      <!-- Notification Popup -->
+      <div class="notification-popup" id="notificationPopup">
+        <div class="popup-content">
+          <div class="popup-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h3 class="popup-title">Đăng ký thành công!</h3>
+          <p class="popup-message">
+            Cảm ơn bạn đã đăng ký tham quan trường. Chúng tôi sẽ liên hệ với bạn
+            trong thời gian sớm nhất. Bạn vui lòng liên hệ 0935005200 để được hỗ
+            trợ thêm
+          </p>
+          <button class="btn btn-primary" id="closePopup">Đóng</button>
         </div>
       </div>
     </section>
@@ -1615,6 +1702,93 @@
             lightbox.classList.remove("show");
             document.body.style.overflow = "auto";
           }
+        });
+      });
+    </script>
+    <!----------pop thong bao----------------->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("registrationForm");
+        const popup = document.getElementById("notificationPopup");
+        const closePopupBtn = document.getElementById("closePopup");
+
+        // Xử lý submit form
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          // Kiểm tra validate trước khi hiển thị popup
+          if (validateForm()) {
+            // Hiển thị popup
+            popup.classList.add("show");
+            document.body.style.overflow = "hidden";
+
+            // Reset form
+            form.reset();
+
+            // Ẩn popup sau 5s tự động
+            // setTimeout(() => {
+            //   popup.classList.remove('show');
+            //   document.body.style.overflow = 'auto';
+            // }, 5000);
+          }
+        });
+
+        // Đóng popup khi click nút đóng
+        closePopupBtn.addEventListener("click", function () {
+          popup.classList.remove("show");
+          document.body.style.overflow = "auto";
+        });
+
+        // Đóng popup khi click bên ngoài
+        popup.addEventListener("click", function (e) {
+          if (e.target === popup) {
+            popup.classList.remove("show");
+            document.body.style.overflow = "auto";
+          }
+        });
+
+        // Hàm validate form
+        function validateForm() {
+          let isValid = true;
+          const inputs = form.querySelectorAll(
+            "input[required], textarea[required]"
+          );
+
+          inputs.forEach((input) => {
+            if (!input.value.trim()) {
+              input.classList.add("error");
+              isValid = false;
+            } else {
+              input.classList.remove("error");
+            }
+          });
+
+          // Validate email format
+          const email = document.getElementById("email");
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (email.value && !emailRegex.test(email.value)) {
+            email.classList.add("error");
+            isValid = false;
+          }
+
+          // Validate phone number (ít nhất 10 số)
+          const phone = document.getElementById("phone");
+          const phoneRegex = /^\d{10,}$/;
+          if (phone.value && !phoneRegex.test(phone.value)) {
+            phone.classList.add("error");
+            isValid = false;
+          }
+
+          return isValid;
+        }
+
+        // Tự động xóa lỗi khi người dùng bắt đầu nhập
+        form.querySelectorAll("input, textarea").forEach((input) => {
+          input.addEventListener("input", function () {
+            if (this.classList.contains("error")) {
+              this.classList.remove("error");
+            }
+          });
         });
       });
     </script>
